@@ -1,5 +1,5 @@
 
-# Active Directory Lab: Remote Desktop Setup, User Creation, and Account Lockouts
+# Active Directory Group Policy, User Creation, and Account Management
 
 ## Lab Overview
 This lab focuses on configuring Remote Desktop for non-administrative users, automating the creation of multiple user accounts, dealing with account lockouts, and enabling/disabling accounts within an Active Directory environment.
