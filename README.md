@@ -1,70 +1,100 @@
-# Active Directory Security: NSGs, Account Lockouts, and Protocols Inspection
+
+# Active Directory Lab: Remote Desktop Setup, User Creation, and Account Lockouts
 
 ## Project Overview
-This project involved configuring network security through Network Security Groups (NSGs), simulating account lockouts, and inspecting security logs within Active Directory (AD). Key activities included configuring account lockout policies, testing lockouts, and enabling/disabling accounts. Logs were observed to assess security operations in both the Domain Controller (DC) and client machine.
+This lab focuses on configuring Remote Desktop for non-administrative users, automating the creation of multiple user accounts, dealing with account lockouts, and enabling/disabling accounts within an Active Directory environment.
 
 ## Steps Performed
 
-### 1. Network Security Groups (NSGs) and Inspecting Network Protocols
+### Part 1: Setup Remote Desktop for Non-Administrative Users on Client-1
 
-1. **Inspecting NSG Configuration**  
-   Inspected the Network Security Groups (NSGs) associated with both the Domain Controller (DC-1) and Client-1 to ensure proper inbound and outbound rules for communication were in place.  
+1. **Turn on VMs**  
+   Using the **Azure Portal**, powered on the **DC-1** and **Client-1** virtual machines to begin the lab.
+
+2. **Log into Client-1**  
+   Logged into **Client-1** as the domain administrator `mydomain.com\jane_admin`.
+
+3. **Configure Remote Desktop**  
+   - Opened **System Properties**.
+   - Clicked on the **Remote Desktop** tab.
+   - Enabled **Remote Desktop** access for **Domain Users**.
    
-   ![Screenshot Placeholder: NSG Configuration](#)
-
-2. **Testing Network Protocols**  
-   Performed tests using different network protocols such as **ICMP** and **RDP** to ensure communication between DC-1 and Client-1 through the NSGs.
-
-   ![Screenshot Placeholder: Network Protocol Testing](#)
-
-### 2. Dealing with Account Lockouts
-
-1. **Simulating a Bad Password Lockout**  
-   Logged into **DC-1** and picked a random user account created earlier. Attempted to log in with incorrect passwords **10 times** to simulate a user lockout scenario.
-
-   ![Screenshot Placeholder: Simulating Failed Login Attempts](#)
-
-2. **Configuring Group Policy for Lockout Threshold**  
-   Configured the Group Policy on DC-1 to **lock accounts after 5 failed login attempts**:
-   - Used the **Group Policy Management Console (GPMC)** to modify the **Account Lockout Policy** in Active Directory.
+   With this configuration, normal non-administrative users can now log into **Client-1** via Remote Desktop. This setup is useful for granting remote access to standard users without admin privileges.  
    
-   ![Screenshot Placeholder: Group Policy Configuration](#)
+   _Note: In production environments, configuring Remote Desktop access for multiple machines would typically be done using Group Policy._
 
-3. **Attempting Lockout**  
-   After setting the policy, attempted to log in with the same user account **6 times** with incorrect passwords. As expected, the account was locked out after the 5th failed attempt.
+---
 
-   ![Screenshot Placeholder: Account Lockout in AD](#)
+### Part 2: Create Multiple Users and Log into Client-1
 
-4. **Unlocking the Account**  
-   Logged into **Active Directory Users and Computers (ADUC)** on DC-1 and unlocked the locked account. I then reset the user’s password and verified the account was functional by successfully logging in with the correct credentials.
+1. **Log into DC-1**  
+   Logged into **DC-1** as `mydomain.com\jane_admin`.
 
-   ![Screenshot Placeholder: Unlocking Account](#)
+2. **Automate User Creation via PowerShell**  
+   - Opened **PowerShell ISE** as an administrator.
+   - Created a new script file and pasted in the PowerShell script to automate user creation.
+   - Ran the script, which created multiple user accounts within the **_EMPLOYEES** Organizational Unit (OU).
+   
+   The accounts were successfully created and could be viewed in **Active Directory Users and Computers (ADUC)**.
 
-### 3. Enabling and Disabling Accounts
+3. **Test Login with a New User Account**  
+   - Logged into **Client-1** using one of the newly created user accounts.
+   - Verified that the login was successful and the account functioned correctly.  
+   
+   _Note: The password for each account was set within the PowerShell script._
 
-1. **Disabling a User Account**  
-   Disabled the same user account in **Active Directory** using ADUC. Attempted to log in after disabling the account and observed the **error message** indicating that the account was disabled.
+---
 
-   ![Screenshot Placeholder: Disabling User Account](#)
+### Part 3: Dealing with Account Lockouts
 
-2. **Re-enabling the User Account**  
-   Re-enabled the account in ADUC and successfully logged in with the account, confirming that it was active again.
+1. **Simulate an Account Lockout**  
+   - Picked a random user account from the ones previously created.
+   - Attempted to log into **Client-1** with an incorrect password 10 times, causing the account to lock out.
 
-   ![Screenshot Placeholder: Re-enabling User Account](#)
+2. **Configure Group Policy for Account Lockout**  
+   - Logged into **DC-1** and opened **Group Policy Management**.
+   - Configured the **Account Lockout Threshold** to lock the account after 5 failed login attempts.
 
-### 4. Observing Logs
+3. **Test Account Lockout Threshold**  
+   - Attempted to log into **Client-1** with the same random user account and intentionally entered the wrong password 6 times.
+   - Observed that the account was locked out after the 6th failed attempt, confirming that the Group Policy worked as expected.
 
-1. **Observing Logs in the Domain Controller (DC-1)**  
-   Accessed the **Event Viewer** on DC-1 and examined logs related to **failed login attempts**, **account lockouts**, and **group policy changes**. Observing these logs provided valuable insights into the security operations of the domain.
+4. **Unlock the Account and Reset the Password**  
+   - Logged into **DC-1** as `jane_admin` and unlocked the user account in **Active Directory Users and Computers (ADUC)**.
+   - Reset the user's password and verified that they could log in successfully.
 
-   ![Screenshot Placeholder: DC-1 Event Viewer Logs](#)
+---
 
-2. **Observing Logs on Client-1**  
-   Logged into Client-1 and used the **Event Viewer** to inspect logs pertaining to network communication and failed login attempts. These logs confirmed the network's response to the account lockout policies and other security measures.
+### Part 4: Enabling and Disabling Accounts
 
-   ![Screenshot Placeholder: Client-1 Event Viewer Logs](#)
+1. **Disable a User Account**  
+   - Disabled the same user account in **Active Directory**.
+   - Attempted to log into **Client-1** with the disabled account and observed that the login failed with an error message.
+
+2. **Re-enable the Account**  
+   - Re-enabled the user account in **Active Directory**.
+   - Attempted to log in again, and the user was successfully able to access **Client-1**.
+
+---
+
+### Part 5: Observing Logs
+
+1. **Observe Domain Controller Logs**  
+   Logged into **DC-1** and reviewed the **Event Viewer** logs for any failed login attempts, account lockouts, and other related security events.
+
+2. **Observe Client-1 Logs**  
+   Similarly, checked the **Event Viewer** logs on **Client-1** to ensure that login attempts and access errors were properly logged.
 
 ---
 
 ## Conclusion
-This project demonstrated essential Active Directory security operations such as account lockouts, enabling/disabling user accounts, and observing security logs. The project also showcased the use of Network Security Groups (NSGs) in Azure to control network communication and how to inspect related protocols.
+This project demonstrated several key skills:
+- Configuring Remote Desktop for non-administrative users.
+- Automating user account creation using PowerShell.
+- Configuring account lockout policies and managing locked accounts.
+- Enabling and disabling user accounts in Active Directory.
+- Monitoring event logs on both the domain controller and client machines.
+
+By completing this lab, foundational skills in managing user access, security policies, and account management within an Active Directory environment were reinforced.
+
+
